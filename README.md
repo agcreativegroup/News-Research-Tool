@@ -273,4 +273,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **⚡ Built with cutting-edge AI for modern equity research**
 
-*Disclaimer: This tool is for research purposes only and does not constitute financial advice. Always consult with qualified financial advisors before making investment decisions.*
+*Disclaimer: This tool is for research purposes only and does not constitute financial advice. Always consult with qualified financial advisors before making investment decisions.*#   N e w s - R e s e a r c h - T o o l  
+ 
