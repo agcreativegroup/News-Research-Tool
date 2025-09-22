@@ -8,13 +8,15 @@ An intelligent news research tool that combines real-time news data with advance
 ![Python](https://img.shields.io/badge/python-3.8%2B-green.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.28%2B-red.svg)
 
-## 🚀 Key Features
+🚀 Key Features
 
-### 🤖 **AI-Powered Analysis**
+
+🤖 **AI-Powered Analysis**
 - **Smart Summarization**: Uses Groq's advanced LLMs for intelligent news analysis
 - **Market Insights**: Provides investment recommendations and risk assessments  
 - **Sentiment Analysis**: Analyzes market sentiment from multiple news sources
 - **Multiple AI Models**: Choose from Llama, Mixtral, and Gemma models
+
 
 ### 📰 **Real-Time News Integration**
 - **Live News Feed**: Fetches latest articles from NewsAPI
@@ -273,5 +275,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **⚡ Built with cutting-edge AI for modern equity research**
 
-*Disclaimer: This tool is for research purposes only and does not constitute financial advice. Always consult with qualified financial advisors before making investment decisions.*#   N e w s - R e s e a r c h - T o o l  
+*Disclaimer: This tool is for research purposes only and does not constitute financial advice. Always consult with qualified financial advisors before making investment decisions.*#   N e w s - R e s e a r c h - T o o l 
+ 
  
