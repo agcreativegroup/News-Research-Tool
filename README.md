@@ -107,10 +107,10 @@ The application will open in your browser at `http://localhost:8501`
 - **Comparative Analysis**: `Tesla vs Ford EV sales`
 
 #### **AI Model Selection**
-- **llama3-8b-8192**: Fast processing, good for quick analysis
-- **llama3-70b-8192**: Detailed analysis, best for comprehensive research
-- **mixtral-8x7b-32768**: Balanced performance and quality
-- **gemma-7b-it**: Efficient processing with good results
+- **openai/gpt-oss-120b**: Fast processing, good for quick analysis
+- **llama-3.1-8b-instant**: Detailed analysis, best for comprehensive research
+- **moonshotai/kimi-k2-instruct-0905**: Balanced performance and quality
+- **mixtral-8x7b-32768**: Efficient processing with good results
 
 #### **Research Settings**
 - **Date Range**: 1-30 days (adjust based on research needs)
@@ -278,3 +278,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 *Disclaimer: This tool is for research purposes only and does not constitute financial advice. Always consult with qualified financial advisors before making investment decisions.*#   N e w s - R e s e a r c h - T o o l 
  
  
+
