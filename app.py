@@ -15,7 +15,7 @@ from ui_components import (
     load_custom_css, render_header, render_sidebar_config, render_search_interface,
     display_news_card, display_ai_summary, display_analytics_dashboard,
     display_error_message, display_success_message, render_footer, render_help_section,
-    create_download_button
+    create_download_button, initialize_search_history, add_to_search_history
 )
 
 def initialize_app():
@@ -35,6 +35,9 @@ def initialize_app():
         st.session_state.research_history = []
     if 'current_analysis' not in st.session_state:
         st.session_state.current_analysis = None
+    
+    # Initialize search history
+    initialize_search_history()
 
 def main():
     """Main application function"""
@@ -45,7 +48,7 @@ def main():
     # Render header
     render_header()
     
-    # Render sidebar configuration
+    # Render sidebar configuration (includes search history)
     config = render_sidebar_config()
     
     # Render search interface
@@ -177,6 +180,9 @@ def process_research_request(query: str, config: dict):
             'config': config.copy()
         }
         
+        # Add to search history (NEW)
+        add_to_search_history(query, len(valid_articles))
+        
         # Add to research history
         st.session_state.research_history.append({
             'query': query,
@@ -192,7 +198,7 @@ def process_research_request(query: str, config: dict):
         display_success_message("articles_fetched", str(len(valid_articles)))
         
         # Automatically scroll to results
-        time.sleep(0.5)  # Small delay for better UX
+        time.sleep(0.5)
         
     except Exception as e:
         display_error_message("general_error", str(e))
@@ -205,34 +211,9 @@ def display_research_results(analysis_data: dict, config: dict):
     st.subheader(f"🎯 Research Results for: '{analysis_data['query']}'")
     
     # Create tabs for different views
-    tab1, tab2, tab3, tab4 = st.tabs(["🤖 AI Analysis", "📰 News Articles", "📊 Analytics", "📋 Export"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📰 News Articles", "🤖 AI Analysis", "📊 Analytics", "📋 Export"])
     
     with tab1:
-        # Display AI summary
-        display_ai_summary(
-            summary=analysis_data['summary'],
-            query=analysis_data['query'],
-            metadata=analysis_data['metadata'],
-            settings=config
-        )
-        
-        # Quick action buttons
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            if st.button("🔄 Regenerate Analysis", key="regen"):
-                st.info("Regenerating analysis with same data...")
-                # Could implement re-analysis with different model
-        
-        with col2:
-            if st.button("📤 Share Analysis", key="share"):
-                st.success("Analysis URL copied to clipboard! (Feature coming soon)")
-        
-        with col3:
-            if st.button("⭐ Save to Favorites", key="fav"):
-                st.success("Analysis saved to favorites! (Feature coming soon)")
-    
-    with tab2:
         st.subheader(f"📰 News Articles ({len(analysis_data['articles'])} found)")
         
         # Sorting options
@@ -287,12 +268,35 @@ def display_research_results(analysis_data: dict, config: dict):
         else:
             for article in articles_to_show:
                 display_news_card(article, config)
-                st.markdown("---")
         
         # Show total count
         if len(filtered_articles) != len(analysis_data['articles']):
             st.info(f"Showing {len(articles_to_show)} of {len(filtered_articles)} filtered articles "
                    f"(total: {len(analysis_data['articles'])})")
+    
+    with tab2:
+        # Display AI summary
+        display_ai_summary(
+            summary=analysis_data['summary'],
+            query=analysis_data['query'],
+            metadata=analysis_data['metadata'],
+            settings=config
+        )
+        
+        # Quick action buttons
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("🔄 Regenerate Analysis", key="regen"):
+                st.info("Regenerating analysis with same data...")
+        
+        with col2:
+            if st.button("📤 Share Analysis", key="share"):
+                st.success("Analysis URL copied to clipboard! (Feature coming soon)")
+        
+        with col3:
+            if st.button("⭐ Save to Favorites", key="fav"):
+                st.success("Analysis saved to favorites! (Feature coming soon)")
     
     with tab3:
         # Display comprehensive analytics
@@ -303,7 +307,7 @@ def display_research_results(analysis_data: dict, config: dict):
             st.subheader("📜 Research History")
             
             history_data = []
-            for item in reversed(st.session_state.research_history[-10:]):  # Last 10 searches
+            for item in reversed(st.session_state.research_history[-10:]):
                 history_data.append({
                     'Query': item['query'],
                     'Articles': item['article_count'],
@@ -339,12 +343,11 @@ def display_research_results(analysis_data: dict, config: dict):
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            # PDF Export (using reportlab or weasyprint alternative)
             pdf_content = create_pdf_content(
                 summary=analysis_data['summary'],
                 query=analysis_data['query'],
                 metadata=analysis_data['metadata'],
-                articles=analysis_data['articles'][:5]  # Include top 5 articles
+                articles=analysis_data['articles'][:5]
             )
             
             st.download_button(
@@ -357,7 +360,6 @@ def display_research_results(analysis_data: dict, config: dict):
             )
         
         with col2:
-            # CSV Export
             csv_content = create_csv_content(analysis_data['articles'], analysis_data['metadata'])
             
             st.download_button(
@@ -370,7 +372,6 @@ def display_research_results(analysis_data: dict, config: dict):
             )
         
         with col3:
-            # Email functionality
             if st.button("📧 Email Report", use_container_width=True):
                 email_content = create_email_template(
                     summary=analysis_data['summary'],
@@ -378,7 +379,6 @@ def display_research_results(analysis_data: dict, config: dict):
                     metadata=analysis_data['metadata']
                 )
                 
-                # Show email content in expandable section
                 with st.expander("📧 Email Content Preview"):
                     st.text_area(
                         "Email Subject:",
@@ -397,7 +397,6 @@ def display_research_results(analysis_data: dict, config: dict):
             col_a, col_b = st.columns(2)
             
             with col_a:
-                # JSON Export
                 import json
                 json_data = {
                     'query': analysis_data['query'],
@@ -420,7 +419,6 @@ def display_research_results(analysis_data: dict, config: dict):
                 )
             
             with col_b:
-                # Summary-only export
                 summary_content = f"""
 MARKET RESEARCH SUMMARY
 Query: {analysis_data['query']}
@@ -458,7 +456,7 @@ def create_pdf_content(summary: str, query: str, metadata: dict, articles: list)
     
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
-    html_content = """
+    html_content = f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -484,7 +482,7 @@ def create_pdf_content(summary: str, query: str, metadata: dict, articles: list)
         
         <div class="content">
             <h2>🤖 AI Analysis Summary</h2>
-            <div>{summary.replace('\n', '<br>')}</div>
+            <div>{summary.replace(chr(10), '<br>')}</div>
             
             <div class="metrics">
                 <div class="metric">
@@ -532,7 +530,6 @@ def create_csv_content(articles: list, metadata: dict) -> str:
     output = io.StringIO()
     writer = csv.writer(output)
     
-    # Write headers
     writer.writerow([
         'Article_Number',
         'Title',
@@ -543,7 +540,6 @@ def create_csv_content(articles: list, metadata: dict) -> str:
         'URL'
     ])
     
-    # Write article data
     for i, article in enumerate(articles, 1):
         writer.writerow([
             i,
@@ -555,7 +551,6 @@ def create_csv_content(articles: list, metadata: dict) -> str:
             article.get('url', '')
         ])
     
-    # Add summary row
     writer.writerow([])
     writer.writerow(['Summary Statistics'])
     writer.writerow(['Total Articles', len(articles)])
